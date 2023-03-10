@@ -1,0 +1,101 @@
+import simplegui
+
+# Define the canvas size
+CANVAS_WIDTH = 500
+CANVAS_HEIGHT = 200
+
+# Define the starting x-coordinate of the text
+x = 0
+
+def draw_handler(canvas):
+    global x  # use the global variable x to track the position of the text
+    
+    # Draw the text on the canvas at the current x-coordinate
+    canvas.draw_text("Welcome to Market Street Chiropractic", (x, 100), 25, 'Maroon')
+    
+    # Update the x-coordinate for the next frame
+    x += 2
+    
+    # If the text has gone off the right side of the canvas, reset the x-coordinate to the left side
+    if x > CANVAS_WIDTH:
+        x = 0
+
+# Create a frame and assign callbacks to event handlers
+frame = simplegui.create_frame("Welcome", CANVAS_WIDTH, CANVAS_HEIGHT)
+frame.set_canvas_background("white")  # set the canvas background color
+frame.set_draw_handler(draw_handler)
+
+# Start the frame animation
+frame.start()
+
+#program starts here
+patient_data = []
+
+while True:
+    has_data = False
+    numbervisits = []
+    price = []
+    names = []
+
+    while True:
+        # calculations for most amount of visits and total revenue
+        if not has_data:
+            print("Start Program")
+        else:
+            print("The most amount of office visits is: " + str(max(numbervisits)))
+            print("The least amount of office visits is: " + str(min(numbervisits)))
+            print("The most revenue collected in total from one patient is: " + str(max(price)) + " dollars")
+            print("The least revenue collected in total from one patient is: " + str(min(price)) + " dollars")
+            print("The average revenue collected is " + str(sum(price)/len(price)) + " dollars")
+            print("The average number of office visits is " + str(sum(numbervisits)/len(numbervisits)))
+
+        # add a way to add new patients if chosen to
+        more = input("\nDo you want to add more patients? (Y or N): ")
+
+        if more == 'Y' or more == 'y' or more == 'yes' or more == 'Yes':
+            addnew = input("What is the new patient's name? ").upper()
+            newvisit = int(input("How many total visits for this patient? "))
+            newprice = float(input("What is the total cost of their visits? "))
+            # calculate and print the new patient's average cost per visit
+            print("\n" + addnew + "'s average cost per visit is ", end='')
+            print("{:.2f}".format(newprice / newvisit), end='')
+            print(" dollars")
+
+            # add new patient data to the existing data
+            numbervisits.append(newvisit)
+            price.append(newprice)
+            names.append(addnew)
+            has_data = True
+        else:
+            print("Data Complete")
+            break
+
+    # calculate and print average number of visits
+    if numbervisits:
+        average_visits = sum(numbervisits) / len(numbervisits)
+        print("\nThe average number of visits per patient is: {:.2f}".format(average_visits))
+
+    # calculate and print average cost per visit
+    if price:
+        total_visits = sum(numbervisits)
+        total_cost = sum(price)
+        average_cost_per_visit = total_cost / total_visits
+        print("The average cost per visit is: {:.2f} dollars".format(average_cost_per_visit))
+
+    # print the list of patient names, number of visits, and total cost of visits
+    if names:
+        sorted_names = sorted(names) # sort the patient names alphabetically
+        print("\nPatient List:")
+        for name in sorted_names:
+            i = names.index(name)
+            print(name + " had " + str(numbervisits[i]) + " visits totaling " + str(price[i]) + " dollars.")
+            
+            # add patient data to the patient_data list
+            patient_data.append({'name': name, 'visits': numbervisits[i], 'cost': price[i]})
+
+    run_again = input("\nDo you want to run the program again? (Y or N): ")
+    if not (run_again.lower() in ('y', 'yes')):
+        # print combined patient data at the end of the program
+        print("\nCombined Patient Data:")
+        for patient in patient_data:
+            print("{} had {} visits totaling {:.2f} dollars.".format(patient['name'], patient['visits'], patient['cost']))
